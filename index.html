@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Vote Button</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: white;
+    }
+    #vote-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #vote-button {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    #vote-button:hover {
+      background-color: #c0392b;
+    }
+    #counter {
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="vote-container">
+    <button id="vote-button">❤️ Click it if you like it !</button>
+    <span id="counter">...</span>
+  </div>
+
+  <script>
+    const counterEl = document.getElementById("counter");
+    const voteBtn = document.getElementById("vote-button");
+
+    const url = "https://api.npoint.io/51115de1e44b2df6cbd4";
+
+    async function fetchVotes() {
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        counterEl.innerText = data.votes ?? 0;
+      } catch (err) {
+        counterEl.innerText = "⚠️";
+        console.error("Erreur de chargement :", err);
+      }
+    }
+
+    async function incrementVote() {
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const newCount = (data.votes ?? 0) + 1;
+
+        await fetch(url, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ votes: newCount })
+        });
+
+        counterEl.innerText = newCount;
+      } catch (err) {
+        alert("Erreur de vote !");
+        console.error("Erreur vote :", err);
+      }
+    }
+
+    voteBtn.addEventListener("click", incrementVote);
+    fetchVotes();
+  </script>
+</body>
+</html>
